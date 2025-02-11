@@ -2,12 +2,8 @@
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract ChainOfCustody is ERC721 {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIdCounter;
-
     struct Evidence {
         uint256 id;
         string title;
@@ -29,15 +25,15 @@ contract ChainOfCustody is ERC721 {
     mapping(uint256 => CustodyRecord[]) public custodyHistory;
 
     address public admin;
-    uint256 private evidenceCounter;
+    uint256 private evidenceCounter; // Manual counter
 
     event EvidenceRegistered(uint256 indexed evidenceId, string title, string description, string imageURI, address indexed custodian, uint256 timestamp);
     event CustodyTransferred(uint256 indexed evidenceId, address indexed fromCustodian, address indexed toCustodian, uint256 timestamp);
 
-    modifier onlyAdmin() {
-        require(msg.sender == admin, "only admin can perform this option");
-        _;
-    }
+    // modifier onlyAdmin() {
+    //     require(msg.sender == admin, "only admin can perform this operation");
+    //     _;
+    // }
 
     modifier onlyCustodian(uint256 evidenceId) {
         require(evidences[evidenceId].currentCustodian == msg.sender, "only the current custodian can call this");
@@ -46,16 +42,15 @@ contract ChainOfCustody is ERC721 {
 
     constructor() ERC721("ChainOfCustodyToken", "COC") {
         admin = msg.sender;
-        evidenceCounter = 0;
+        evidenceCounter = 0; // Initialize manual counter
     }
 
-    function registerEvidence(string memory _title, string memory _description, string memory _imageURI) public onlyAdmin {
-        evidenceCounter++;
-        uint256 tokenId = _tokenIdCounter.current();
+    function registerEvidence(string memory _title, string memory _description, string memory _imageURI) public  {
+        uint256 tokenId = evidenceCounter; // Use manual counter
+        evidenceCounter++; // Increment manually
 
         // Mint an ERC721 token for the evidence
         _mint(msg.sender, tokenId);
-        _tokenIdCounter.increment();
 
         evidences[tokenId] = Evidence({
             id: tokenId,
@@ -94,7 +89,6 @@ contract ChainOfCustody is ERC721 {
         return evidences[_evidenceId].currentCustodian;
     }
 
-    // Optional function to get the metadata of the evidence (including title, description, and image)
     function getEvidenceMetadata(uint256 _evidenceId) public view returns (string memory, string memory, string memory) {
         require(evidences[_evidenceId].exists, "Evidence does not exist");
         Evidence memory evidence = evidences[_evidenceId];

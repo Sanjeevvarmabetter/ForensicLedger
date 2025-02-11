@@ -11,7 +11,7 @@ import Navbar from "./components/Navbar";
 
 import RetrieveMetadata from "./pages/RetrieveMetadata";
 
-const CONTRACT_ADDRESS = "0xa36cCb08f076577Fa5794B47f14435c48366B3f2"; // Replace with actual address
+const CONTRACT_ADDRESS = "0xb7E834E056f454B09ae67E121E03CD598420b2B9"; 
 
 function App() {
   const [account, setAccount] = useState(null);
